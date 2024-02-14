@@ -1,5 +1,5 @@
 export enum StatusParty {
-  CREATED = 'CREATED',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+   CREATED = 'CREATED',
+   ACTIVE = 'ACTIVE',
+   INACTIVE = 'INACTIVE',
 }

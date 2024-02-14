@@ -1,4 +1,4 @@
 export enum OwnerType {
-  USER = 'USER',
-  PARTY = 'PARTY',
+   USER = 'USER',
+   PARTY = 'PARTY',
 }

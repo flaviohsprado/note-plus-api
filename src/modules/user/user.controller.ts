@@ -6,12 +6,12 @@ import { Public } from '@decorators/isPublicRoute.decorator';
 import { IAuth } from '@interfaces/auth.interface';
 import { HttpCode, Inject } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  Param,
-  Req,
-  UploadedFile,
-  UseInterceptors,
+   Body,
+   Controller,
+   Param,
+   Req,
+   UploadedFile,
+   UseInterceptors,
 } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
@@ -32,76 +32,78 @@ import { UserModule } from './user.module';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(
-    @Inject(UserModule.GET_USERS_USECASES_PROXY)
-    private readonly findAllUserUseCase: UseCaseProxy<FindAllUserUseCase>,
-    @Inject(UserModule.GET_USER_USECASES_PROXY)
-    private readonly findOneUserUseCase: UseCaseProxy<FindOneUserUseCase>,
-    @Inject(UserModule.POST_USER_USECASES_PROXY)
-    private readonly createUserUseCase: UseCaseProxy<CreateUserUseCase>,
-    @Inject(UserModule.PUT_USER_USECASES_PROXY)
-    private readonly updateUserUseCase: UseCaseProxy<UpdateUserUseCase>,
-    @Inject(UserModule.PUT_USER_FILE_USECASES_PROXY)
-    private readonly updateUserFileUseCase: UseCaseProxy<UpdateUserFileUseCase>,
-    @Inject(UserModule.DELETE_USER_USECASES_PROXY)
-    private readonly deleteUserUseCase: UseCaseProxy<DeleteUserUseCase>,
-  ) {}
+   constructor(
+      @Inject(UserModule.GET_USERS_USECASES_PROXY)
+      private readonly findAllUserUseCase: UseCaseProxy<FindAllUserUseCase>,
+      @Inject(UserModule.GET_USER_USECASES_PROXY)
+      private readonly findOneUserUseCase: UseCaseProxy<FindOneUserUseCase>,
+      @Inject(UserModule.POST_USER_USECASES_PROXY)
+      private readonly createUserUseCase: UseCaseProxy<CreateUserUseCase>,
+      @Inject(UserModule.PUT_USER_USECASES_PROXY)
+      private readonly updateUserUseCase: UseCaseProxy<UpdateUserUseCase>,
+      @Inject(UserModule.PUT_USER_FILE_USECASES_PROXY)
+      private readonly updateUserFileUseCase: UseCaseProxy<UpdateUserFileUseCase>,
+      @Inject(UserModule.DELETE_USER_USECASES_PROXY)
+      private readonly deleteUserUseCase: UseCaseProxy<DeleteUserUseCase>,
+   ) {}
 
-  @GetApiResponse(UserPresenter, '/me')
-  public async findUser(@Req() req: IAuth): Promise<UserPresenter> {
-    const user = await this.findOneUserUseCase
-      .getInstance()
-      .execute(req.user.id);
+   @GetApiResponse(UserPresenter, '/me')
+   public async findUser(@Req() req: IAuth): Promise<UserPresenter> {
+      const user = await this.findOneUserUseCase
+         .getInstance()
+         .execute(req.user.id);
 
-    return new UserPresenter(user);
-  }
+      return new UserPresenter(user);
+   }
 
-  @GetApiResponse(UserPresenter, ':id')
-  public async findOneUser(@Param('id') id: string): Promise<UserPresenter> {
-    const user = await this.findOneUserUseCase.getInstance().execute(id);
+   @GetApiResponse(UserPresenter, ':id')
+   public async findOneUser(@Param('id') id: string): Promise<UserPresenter> {
+      const user = await this.findOneUserUseCase.getInstance().execute(id);
 
-    return new UserPresenter(user);
-  }
+      return new UserPresenter(user);
+   }
 
-  @GetApiResponse(UserPresenter)
-  public async findAllUser(): Promise<UserPresenter[]> {
-    const users = await this.findAllUserUseCase.getInstance().execute();
-    return users.map((user) => new UserPresenter(user));
-  }
+   @GetApiResponse(UserPresenter)
+   public async findAllUser(): Promise<UserPresenter[]> {
+      const users = await this.findAllUserUseCase.getInstance().execute();
+      return users.map((user) => new UserPresenter(user));
+   }
 
-  @Public()
-  @PostApiResponse(UserPresenter, '', false)
-  @UseInterceptors(FileInterceptor('files'))
-  public async createUser(
-    @Body() user: CreateUserDTO,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<UserPresenter> {
-    const newFile: CreateFileDTO = await FileUtils.createFile(file);
+   @Public()
+   @PostApiResponse(UserPresenter, '', false)
+   @UseInterceptors(FileInterceptor('files'))
+   public async createUser(
+      @Body() user: CreateUserDTO,
+      @UploadedFile() file: Express.Multer.File,
+   ): Promise<UserPresenter> {
+      const newFile: CreateFileDTO = await FileUtils.createFile(file);
 
-    return await this.createUserUseCase.getInstance().execute(user, newFile);
-  }
+      return await this.createUserUseCase.getInstance().execute(user, newFile);
+   }
 
-  @PutApiResponse(UserPresenter, '/:id')
-  public async updateUser(
-    @Param('id') id: string,
-    @Body() user: UpdateUserDTO,
-  ): Promise<UserPresenter> {
-    return await this.updateUserUseCase.getInstance().execute(id, user);
-  }
+   @PutApiResponse(UserPresenter, '/:id')
+   public async updateUser(
+      @Param('id') id: string,
+      @Body() user: UpdateUserDTO,
+   ): Promise<UserPresenter> {
+      return await this.updateUserUseCase.getInstance().execute(id, user);
+   }
 
-  @PutApiResponse(UserPresenter, '/:id/avatar')
-  @UseInterceptors(FileInterceptor('file'))
-  public async updateUserFile(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<UserPresenter> {
-    const newFile: CreateFileDTO = await FileUtils.createFile(file);
-    return await this.updateUserFileUseCase.getInstance().execute(id, newFile);
-  }
+   @PutApiResponse(UserPresenter, '/:id/avatar')
+   @UseInterceptors(FileInterceptor('file'))
+   public async updateUserFile(
+      @Param('id') id: string,
+      @UploadedFile() file: Express.Multer.File,
+   ): Promise<UserPresenter> {
+      const newFile: CreateFileDTO = await FileUtils.createFile(file);
+      return await this.updateUserFileUseCase
+         .getInstance()
+         .execute(id, newFile);
+   }
 
-  @HttpCode(204)
-  @DeleteApiResponse('/:id')
-  public async deleteUser(@Param('id') id: string): Promise<User> {
-    return await this.deleteUserUseCase.getInstance().execute(id);
-  }
+   @HttpCode(204)
+   @DeleteApiResponse('/:id')
+   public async deleteUser(@Param('id') id: string): Promise<User> {
+      return await this.deleteUserUseCase.getInstance().execute(id);
+   }
 }

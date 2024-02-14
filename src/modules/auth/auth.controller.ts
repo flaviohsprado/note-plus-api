@@ -11,15 +11,17 @@ import { LoginUseCase } from './use-cases/login.usecase';
 @ApiTags('Authentication')
 @Controller('public/auth')
 export class AuthController {
-  constructor(
-    @Inject(AuthModule.LOGIN_USECASES_PROXY)
-    private readonly loginUseCase: UseCaseProxy<LoginUseCase>,
-  ) {}
+   constructor(
+      @Inject(AuthModule.LOGIN_USECASES_PROXY)
+      private readonly loginUseCase: UseCaseProxy<LoginUseCase>,
+   ) {}
 
-  @Public()
-  @PostApiResponse(AuthPresenter, 'login', false)
-  public async login(@Body() authCredentials: AuthDTO): Promise<AuthPresenter> {
-    const credentials = new AuthDTO(authCredentials);
-    return this.loginUseCase.getInstance().execute(credentials);
-  }
+   @Public()
+   @PostApiResponse(AuthPresenter, 'login', false)
+   public async login(
+      @Body() authCredentials: AuthDTO,
+   ): Promise<AuthPresenter> {
+      const credentials = new AuthDTO(authCredentials);
+      return this.loginUseCase.getInstance().execute(credentials);
+   }
 }

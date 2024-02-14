@@ -12,57 +12,57 @@ import { CreateUserDTO } from '../presenters/user.dto';
 import { UserPresenter } from '../presenters/user.presenter';
 
 export class CreateUserUseCase {
-  constructor(
-    private readonly logger: ILogger,
-    private readonly repository: IUserRepository,
-    private readonly fileRepository: IFileRepository,
-    private readonly bcryptService: IBcryptService,
-    private readonly jwtService: IJwtService,
-    private readonly uploadService: IUploadService,
-    private readonly environmentConfig: IEnvironmentConfigService,
-  ) {}
+   constructor(
+      private readonly logger: ILogger,
+      private readonly repository: IUserRepository,
+      private readonly fileRepository: IFileRepository,
+      private readonly bcryptService: IBcryptService,
+      private readonly jwtService: IJwtService,
+      private readonly uploadService: IUploadService,
+      private readonly environmentConfig: IEnvironmentConfigService,
+   ) {}
 
-  public async execute(
-    user: CreateUserDTO,
-    file?: CreateFileDTO,
-  ): Promise<UserPresenter> {
-    if (await this.repository.alreadyExists('email', user.email)) {
-      throw new ForbiddenException({
-        message: 'Email already exists in app!',
-        statusCode: HttpStatus.FORBIDDEN,
+   public async execute(
+      user: CreateUserDTO,
+      file?: CreateFileDTO,
+   ): Promise<UserPresenter> {
+      if (await this.repository.alreadyExists('email', user.email)) {
+         throw new ForbiddenException({
+            message: 'Email already exists in app!',
+            statusCode: HttpStatus.FORBIDDEN,
+         });
+      }
+
+      if (file) user.file = await this.createFile(user.id, file);
+
+      user.password = await this.bcryptService.createHash(user.password);
+
+      const createdUser: UserPresenter = new UserPresenter(
+         await this.repository.create(user),
+      );
+
+      createdUser.accessToken = this.jwtService.createToken({
+         id: createdUser.id,
       });
-    }
 
-    if (file) user.file = await this.createFile(user.id, file);
+      this.logger.log(
+         'CreateUserUseCases execute()',
+         'New user have been inserted',
+      );
 
-    user.password = await this.bcryptService.createHash(user.password);
+      return createdUser;
+   }
 
-    const createdUser: UserPresenter = new UserPresenter(
-      await this.repository.create(user),
-    );
+   private async createFile(
+      id: string,
+      file: CreateFileDTO,
+   ): Promise<CreateFileDTO> {
+      let fileUploaded: CreateFileDTO = file;
 
-    createdUser.accessToken = this.jwtService.createToken({
-      id: createdUser.id,
-    });
+      if (this.environmentConfig.getCloudUpload()) {
+         fileUploaded = await this.uploadService.uploadFile(file);
+      }
 
-    this.logger.log(
-      'CreateUserUseCases execute()',
-      'New user have been inserted',
-    );
-
-    return createdUser;
-  }
-
-  private async createFile(
-    id: string,
-    file: CreateFileDTO,
-  ): Promise<CreateFileDTO> {
-    let fileUploaded: CreateFileDTO = file;
-
-    if (this.environmentConfig.getCloudUpload()) {
-      fileUploaded = await this.uploadService.uploadFile(file);
-    }
-
-    return await this.fileRepository.create(fileUploaded, id, OwnerType.USER);
-  }
+      return await this.fileRepository.create(fileUploaded, id, OwnerType.USER);
+   }
 }

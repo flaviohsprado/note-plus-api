@@ -12,32 +12,32 @@ import { BcryptModule } from './services/bcrypt/bcrypt.module';
 import { JwtModule } from './services/jwt/jwt.module';
 
 @Module({
-  imports: [
-    PassportModule,
-    LoggerModule,
-    JwtModule,
-    BcryptModule,
-    ControllersModule,
-  ],
-  providers: [
-    LocalStrategy,
-    JwtStrategy,
-    {
-      provide: 'EXCEPTION_FILTER',
-      useClass: CustomHttpException,
-    },
-    {
-      provide: 'APP_INTERCEPTOR',
-      useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: 'APP_INTERCEPTOR',
-      useClass: TransformResponseInterceptor,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+   imports: [
+      PassportModule,
+      LoggerModule,
+      JwtModule,
+      BcryptModule,
+      ControllersModule,
+   ],
+   providers: [
+      LocalStrategy,
+      JwtStrategy,
+      {
+         provide: 'EXCEPTION_FILTER',
+         useClass: CustomHttpException,
+      },
+      {
+         provide: 'APP_INTERCEPTOR',
+         useClass: ClassSerializerInterceptor,
+      },
+      {
+         provide: 'APP_INTERCEPTOR',
+         useClass: TransformResponseInterceptor,
+      },
+      {
+         provide: APP_GUARD,
+         useClass: JwtAuthGuard,
+      },
+   ],
 })
 export class AppModule {}

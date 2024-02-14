@@ -5,17 +5,17 @@ import { IUserInfo } from '../interfaces/auth.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
-    });
-  }
+   constructor() {
+      super({
+         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+         ignoreExpiration: false,
+         secretOrKey: process.env.JWT_SECRET,
+      });
+   }
 
-  public async validate(payload: IUserInfo) {
-    return {
-      id: payload.id,
-    };
-  }
+   public async validate(payload: IUserInfo) {
+      return {
+         id: payload.id,
+      };
+   }
 }

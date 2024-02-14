@@ -1,80 +1,80 @@
 import { CreateFileDTO } from '@modules/file/presenters/file.dto';
 
 export class FileUtils {
-  static async createFile(file: Express.Multer.File): Promise<CreateFileDTO> {
-    if (file) {
-      const { originalname, mimetype, encoding, buffer } = await file;
+   static async createFile(file: Express.Multer.File): Promise<CreateFileDTO> {
+      if (file) {
+         const { originalname, mimetype, encoding, buffer } = await file;
 
-      const key = `${Date.now()}-${originalname}`;
+         const key = `${Date.now()}-${originalname}`;
 
-      const newFile: CreateFileDTO = new CreateFileDTO({
-        originalname,
-        fieldname: 'file',
-        mimetype,
-        encoding,
-        buffer,
-        key,
-      });
-
-      return newFile;
-    }
-  }
-
-  static async createManyFiles(
-    files: Express.Multer.File[],
-  ): Promise<CreateFileDTO[]> {
-    const newFiles: CreateFileDTO[] = [];
-
-    if (files) {
-      for (const file of files) {
-        const { originalname, mimetype, encoding, buffer } = await file;
-
-        const key = `${Date.now()}-${originalname}`;
-
-        newFiles.push(
-          new CreateFileDTO({
+         const newFile: CreateFileDTO = new CreateFileDTO({
             originalname,
             fieldname: 'file',
             mimetype,
             encoding,
             buffer,
             key,
-          }),
-        );
+         });
+
+         return newFile;
       }
+   }
 
-      return newFiles;
-    }
-  }
+   static async createManyFiles(
+      files: Express.Multer.File[],
+   ): Promise<CreateFileDTO[]> {
+      const newFiles: CreateFileDTO[] = [];
 
-  static async createBufferFromReadStreamFile(
-    file: Express.Multer.File,
-  ): Promise<Buffer> {
-    const { stream } = file;
+      if (files) {
+         for (const file of files) {
+            const { originalname, mimetype, encoding, buffer } = await file;
 
-    const chunks = [];
+            const key = `${Date.now()}-${originalname}`;
 
-    return await new Promise<Buffer>((resolve, reject) => {
-      let buffer: Buffer;
+            newFiles.push(
+               new CreateFileDTO({
+                  originalname,
+                  fieldname: 'file',
+                  mimetype,
+                  encoding,
+                  buffer,
+                  key,
+               }),
+            );
+         }
 
-      stream.on('data', function (chunk) {
-        chunks.push(chunk);
+         return newFiles;
+      }
+   }
+
+   static async createBufferFromReadStreamFile(
+      file: Express.Multer.File,
+   ): Promise<Buffer> {
+      const { stream } = file;
+
+      const chunks = [];
+
+      return await new Promise<Buffer>((resolve, reject) => {
+         let buffer: Buffer;
+
+         stream.on('data', function (chunk) {
+            chunks.push(chunk);
+         });
+
+         stream.on('end', function () {
+            buffer = Buffer.concat(chunks);
+            resolve(buffer);
+         });
+
+         stream.on('error', reject);
       });
+   }
 
-      stream.on('end', function () {
-        buffer = Buffer.concat(chunks);
-        resolve(buffer);
-      });
+   static async createBase64FromBuffer(
+      file: Express.Multer.File,
+   ): Promise<string> {
+      const buffer = await this.createBufferFromReadStreamFile(file);
 
-      stream.on('error', reject);
-    });
-  }
-
-  static async createBase64FromBuffer(
-    file: Express.Multer.File,
-  ): Promise<string> {
-    const buffer = await this.createBufferFromReadStreamFile(file);
-
-    return buffer.toString('base64');
-  }
+      return buffer.toString('base64');
+   }
 }
