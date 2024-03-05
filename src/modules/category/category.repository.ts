@@ -13,12 +13,16 @@ export class CategoryRepository implements ICategoryRepository {
    constructor(
       @InjectRepository(Category)
       private readonly repository: Repository<Category>,
-   ) {}
+   ) { }
 
    public async findAll(userId: string): Promise<Category[]> {
-      return this.repository.find({
-         where: { userId },
-      });
+      return this.repository.manager
+         .createQueryBuilder(Category, 'category')
+         .leftJoinAndSelect('category.children', 'children')
+         .leftJoinAndSelect('category.notes', 'notes')
+         .where('category.userId = :userId', { userId })
+         .andWhere('category.parentId IS NULL')
+         .getMany();
    }
 
    public async findOne(id: string): Promise<Category> {

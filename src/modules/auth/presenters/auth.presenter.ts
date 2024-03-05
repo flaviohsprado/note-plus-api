@@ -3,6 +3,12 @@ import { IsRequiredString } from '@decorators/validators/isRequiredString.decora
 
 export class AuthPresenter {
    @IsRequiredString()
+   public id: string;
+
+   @IsRequiredString()
+   public email: string;
+
+   @IsRequiredString()
    public username: string;
 
    @IsRequiredString()
@@ -11,6 +17,8 @@ export class AuthPresenter {
    public file: FilePresenter;
 
    constructor(auth: AuthPresenter) {
+      this.id = auth.id;
+      this.email = auth.email;
       this.username = auth.username;
       this.accessToken = auth.accessToken;
       this.file = new FilePresenter(auth.file);

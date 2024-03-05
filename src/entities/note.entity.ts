@@ -1,4 +1,6 @@
+import { IsCreateDateColumn } from '@/common/decorators/columns/isCreateDateColumn.decorator';
 import { IsRequiredStringColumn } from '@/common/decorators/columns/isRequiredStringColumn.decorator';
+import { IsUpdateDateColumn } from '@/common/decorators/columns/isUpdateDateColumn.decorator';
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Category } from './category.entity';
 
@@ -15,6 +17,12 @@ export class Note {
 
    @IsRequiredStringColumn()
    public content: string;
+
+   @IsCreateDateColumn()
+   public createdAt: Date;
+
+   @IsUpdateDateColumn()
+   public updatedAt: Date;
 
    @ManyToOne(() => Category, (category) => category.notes, {
       onDelete: 'CASCADE',

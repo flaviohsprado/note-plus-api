@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { connect } from '@ngrok/ngrok';
 import { AppModule } from './app.module';
 import { SetupInterceptor } from './common/utils/setupInterceptor';
 import { SetupPipe } from './common/utils/setupPipe';
@@ -18,10 +19,14 @@ async function server() {
 
    SetupSwagger.for(app);
 
-   await app.listen(port);
+   await app.listen(port, () => {
+      logger.log(`Server running on http://localhost:${port}`);
+      logger.log(`Swagger running on http://localhost:${port}/api`);
+   });
 
-   logger.log(`Server running on http://localhost:${port}`);
-   logger.log(`Swagger running on http://localhost:${port}/api`);
-   logger.log(`Process ID: ${process.pid}`);
+   // Get your endpoint online
+   connect({ addr: port, authtoken_from_env: true }).then((listener) =>
+      console.log(`Ingress established at: ${listener.url()}`),
+   );
 }
 server();

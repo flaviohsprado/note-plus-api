@@ -5,6 +5,7 @@ import {
 } from '@modules/note/presenters/note.dto';
 
 export interface INoteRepository {
+   findAllFromUser?(userId: string): Promise<Note[]>;
    findAll?(categoryId: string): Promise<Note[]>;
    findOne?(id: string): Promise<Note>;
    create?(note: CreateNoteDTO): Promise<Note>;

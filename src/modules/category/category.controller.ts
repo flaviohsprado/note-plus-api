@@ -33,7 +33,7 @@ export class CategoryController {
       private readonly updateCategoryUseCase: UseCaseProxy<UpdateCategoryUseCase>,
       @Inject(CategoryModule.DELETE_CATEGORY_USECASES_PROXY)
       private readonly deleteCategoryUseCase: UseCaseProxy<DeleteCategoryUseCase>,
-   ) {}
+   ) { }
 
    @GetApiResponse(CategoryPresenter, ':id')
    public async findOneCategory(
@@ -63,6 +63,7 @@ export class CategoryController {
       @Body() category: CreateCategoryDTO,
    ): Promise<CategoryPresenter> {
       category.userId = req.user.id;
+
       const createdCategory = await this.createCategoryUseCase
          .getInstance()
          .execute(category);

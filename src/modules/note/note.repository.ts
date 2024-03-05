@@ -10,7 +10,21 @@ export class NoteRepository implements INoteRepository {
    constructor(
       @InjectRepository(Note)
       private readonly repository: Repository<Note>,
-   ) {}
+   ) { }
+
+   public async findAllFromUser(userId: string): Promise<Note[]> {
+      return this.repository.find({
+         where: {
+            category: {
+               userId,
+            },
+         },
+         order: {
+            updatedAt: 'DESC',
+            createdAt: 'DESC',
+         },
+      });
+   }
 
    public async findAll(categoryId: string): Promise<Note[]> {
       return this.repository.find({

@@ -40,4 +40,4 @@ import { JwtModule } from './services/jwt/jwt.module';
       },
    ],
 })
-export class AppModule {}
+export class AppModule { }

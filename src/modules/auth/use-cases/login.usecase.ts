@@ -13,7 +13,7 @@ export class LoginUseCase {
       private readonly jwtService: IJwtService,
       private readonly bcryptService: IBcryptService,
       private readonly userRepository: IUserRepository,
-   ) {}
+   ) { }
 
    public async execute(credentials: AuthDTO): Promise<AuthPresenter> {
       const userValidated: Omit<User, 'password'> = await this.validateUser(
@@ -32,9 +32,11 @@ export class LoginUseCase {
       this.logger.log(`LoginUseCases execute()`, `User have been logged in!`);
 
       return new AuthPresenter({
-         accessToken,
+         id: userValidated.id,
+         email: userValidated.email,
          username: userValidated.username,
          file: userValidated.file,
+         accessToken,
       });
    }
 

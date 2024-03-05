@@ -8,6 +8,7 @@ import { RepositoriesModule } from '../repositories.proxy.module';
 import { NoteRepository } from './note.repository';
 import { CreateNoteUseCase } from './use-cases/create-note.usecase';
 import { DeleteNoteUseCase } from './use-cases/delete-note.usecase';
+import { FindAllNotesFromUserUseCase } from './use-cases/find-all-notes-from-user.usecase';
 import { FindAllNoteUseCase } from './use-cases/find-all-notes.usecase';
 import { FindOneNoteUseCase } from './use-cases/find-one-note.usecase';
 import { UpdateNoteUseCase } from './use-cases/update-note.usecase';
@@ -18,6 +19,7 @@ import { UpdateNoteUseCase } from './use-cases/update-note.usecase';
 export class NoteModule {
    static GET_NOTE_USECASES_PROXY = 'getNoteUsecasesProxy';
    static GET_NOTES_USECASES_PROXY = 'getNotesUsecasesProxy';
+   static GET_NOTES_FROM_USER_USECASES_PROXY = 'getNotesFromUserUsecasesProxy';
    static POST_NOTE_USECASES_PROXY = 'postNoteUsecasesProxy';
    static PUT_NOTE_USECASES_PROXY = 'putNoteUsecasesProxy';
    static DELETE_NOTE_USECASES_PROXY = 'deleteNoteUsecasesProxy';
@@ -35,6 +37,17 @@ export class NoteModule {
                ) =>
                   new UseCaseProxy(
                      new FindAllNoteUseCase(repository, cacheService),
+                  ),
+            },
+            {
+               inject: [NoteRepository, CacheService],
+               provide: NoteModule.GET_NOTES_FROM_USER_USECASES_PROXY,
+               useFactory: (
+                  repository: NoteRepository,
+                  cacheService: CacheService,
+               ) =>
+                  new UseCaseProxy(
+                     new FindAllNotesFromUserUseCase(repository, cacheService),
                   ),
             },
             {
@@ -74,6 +87,7 @@ export class NoteModule {
             },
          ],
          exports: [
+            NoteModule.GET_NOTES_FROM_USER_USECASES_PROXY,
             NoteModule.GET_NOTES_USECASES_PROXY,
             NoteModule.GET_NOTE_USECASES_PROXY,
             NoteModule.POST_NOTE_USECASES_PROXY,

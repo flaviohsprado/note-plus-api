@@ -2,8 +2,9 @@ import { DeleteApiResponse } from '@/common/decorators/requests/deleteApiRespons
 import { GetApiResponse } from '@/common/decorators/requests/getApiResponse.decorator';
 import { PostApiResponse } from '@/common/decorators/requests/postApiResponse.decorator';
 import { PutApiResponse } from '@/common/decorators/requests/putApiResponse.decorator';
+import { IAuth } from '@/common/interfaces/auth.interface';
 import { HttpCode, Inject } from '@nestjs/common';
-import { Body, Controller, Param } from '@nestjs/common/decorators';
+import { Body, Controller, Param, Req } from '@nestjs/common/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { UseCaseProxy } from '@utils/usecase-proxy';
 import { NoteModule } from './note.module';
@@ -21,6 +22,8 @@ export class NoteController {
    constructor(
       @Inject(NoteModule.GET_NOTES_USECASES_PROXY)
       private readonly findAllNotesUseCase: UseCaseProxy<FindAllNoteUseCase>,
+      @Inject(NoteModule.GET_NOTES_FROM_USER_USECASES_PROXY)
+      private readonly findAllNotesFromUserUseCase: UseCaseProxy<FindAllNoteUseCase>,
       @Inject(NoteModule.GET_NOTE_USECASES_PROXY)
       private readonly findOneNoteUseCase: UseCaseProxy<FindOneNoteUseCase>,
       @Inject(NoteModule.POST_NOTE_USECASES_PROXY)
@@ -29,7 +32,16 @@ export class NoteController {
       private readonly updateNoteUseCase: UseCaseProxy<UpdateNoteUseCase>,
       @Inject(NoteModule.DELETE_NOTE_USECASES_PROXY)
       private readonly deleteNoteUseCase: UseCaseProxy<DeleteNoteUseCase>,
-   ) {}
+   ) { }
+
+   @GetApiResponse(NotePresenter)
+   public async findAllNotes(@Req() req: IAuth): Promise<NotePresenter[]> {
+      const notes = await this.findAllNotesFromUserUseCase
+         .getInstance()
+         .execute(req.user.id);
+
+      return notes.map((note) => new NotePresenter(note));
+   }
 
    @GetApiResponse(NotePresenter, ':id')
    public async findOneNote(@Param('id') id: string): Promise<NotePresenter> {
