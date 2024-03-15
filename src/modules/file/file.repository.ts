@@ -11,7 +11,7 @@ export class FileRepository implements IFileRepository {
    constructor(
       @InjectRepository(File)
       private repository: Repository<File>,
-   ) {}
+   ) { }
 
    public async findOne(ownerId: string, ownerType: OwnerType): Promise<File> {
       return await this.repository.findOne({ where: { ownerId, ownerType } });
@@ -44,11 +44,11 @@ export class FileRepository implements IFileRepository {
       ownerId: string,
       ownerType: OwnerType,
    ): Promise<File> {
-      const findedFile: File = await this.findByKey('ownerId', ownerId);
+      const fileToUpdate = await this.repository.create(file);
 
-      if (findedFile) await this.delete(ownerId, ownerType);
+      await this.repository.update({ ownerId, ownerType }, fileToUpdate);
 
-      return await this.create(file, ownerId, ownerType);
+      return await this.findByKey('ownerId', ownerId);
    }
 
    public async updateMany(

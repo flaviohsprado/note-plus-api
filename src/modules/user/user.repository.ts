@@ -10,7 +10,7 @@ export class UserRepository implements IUserRepository {
    constructor(
       @InjectRepository(User)
       private readonly repository: Repository<User>,
-   ) {}
+   ) { }
 
    public async findByKey(key: string, value: string): Promise<User> {
       return await this.repository.findOne({
@@ -38,7 +38,8 @@ export class UserRepository implements IUserRepository {
    }
 
    public async update(id: string, user: User): Promise<User> {
-      return this.repository.save({ ...user, id });
+      await this.repository.update(id, user);
+      return this.repository.findOne({ where: { id } });
    }
 
    public async delete(id: string): Promise<User> {

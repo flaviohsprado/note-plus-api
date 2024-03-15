@@ -35,6 +35,7 @@ export class User {
    @OneToOne(() => File, (file) => file.ownerId, {
       cascade: true,
       onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
       nullable: true,
    })
    @JoinColumn()

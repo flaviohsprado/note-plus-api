@@ -1,4 +1,4 @@
-import { File } from '@entities/file.entity';
+import { FilePresenter } from '@/modules/file/presenters/file.presenter';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserPresenter {
@@ -15,7 +15,7 @@ export class UserPresenter {
    public accessToken?: string;
 
    @ApiProperty({ required: false })
-   public file?: File;
+   public file?: FilePresenter;
 
    @ApiProperty({ required: false })
    public createdAt?: Date;
@@ -28,7 +28,7 @@ export class UserPresenter {
       this.username = user.username;
       this.email = user.email;
       this.accessToken = user.accessToken;
-      this.file = user.file;
+      this.file = new FilePresenter(user.file);
       this.createdAt = user.createdAt;
       this.updatedAt = user.updatedAt;
    }
